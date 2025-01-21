@@ -1,0 +1,40 @@
+﻿@model WeatherApp.Models.AllWeather
+
+<div id="container"></div>
+<div class="weather-widget">
+    <div class="row">
+        <div class="col">
+            <h3>@Model.name, @Model.sys.country</h3>
+            <p>@ViewBag.CurrentTime.ToString("dddd, dd MMMM yyyy, HH:mm")</p>
+            <div class="weather-container">
+                <div class="weather-icon">
+                    <img src="/lib/svg/@ViewBag.CurrentIcon" alt="Weather Icon">
+                </div>
+            </div>
+
+            <div class="weather-info">
+                @{
+                    string temperature = Model.main.temp.ToString("0");
+                    if (temperature == "-0") temperature = "0";
+                }
+                    <h2>@temperature °C</h2>
+            <p>@Model.weather.FirstOrDefault()?.description</p>
+        </div>
+        </div>
+        <div class="col">
+            <div class="weather-details">
+                <p>Wind: @Model.wind.speed km/h</p>
+                <p>Luftfeuchtigkeit: @Model.main.humidity%</p>
+                @{
+                    string temperature2 = Model.main.temp_min.ToString("0");
+                    if (temperature2 == "-0") temperature2 = "0";
+                }
+                <p>Taupunkt: @temperature2 °C</p>
+                <p>Druck:  @Model.main.pressure mb</p>
+                <p>Sichtweite: @Model.visibility km</p>
+                <p>Sonnenaufgang:  @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunrise).ToLocalTime().ToString("HH:mm")</p>
+                <p>Sonnenuntergang:  @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunset).ToLocalTime().ToString("HH:mm")</p>
+            </div>
+        </div>
+    </div>
+</div>
