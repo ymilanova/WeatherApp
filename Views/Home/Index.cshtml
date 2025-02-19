@@ -1,7 +1,12 @@
 ﻿@model WeatherApp.Models.AllWeather
+<div class ="card">
+    <h5 class="card-title">Aktuelle Wetter- und Zeitinfos</h5>
+    <p class="card-text">Bitte wählen Sie eine Stadt aus, für die Sie Wetter- und Zeitinformationen sehen möchten</p>
+    <div class="card-img-bottom" id="map"></div>
+</div>
 
-<div id="container"></div>
-<div class="weather-widget">
+<br />
+<div class="card p-4">
     <div class="row">
         <div class="col">
             <h3>@Model.name, @Model.sys.country</h3>
@@ -16,9 +21,9 @@
                     string temperature = Model.main.temp.ToString("0");
                     if (temperature == "-0") temperature = "0";
                 }
-                    <h2>@temperature °C</h2>
-            <p>@Model.weather.FirstOrDefault()?.description</p>
-        </div>
+                <h2>@temperature °C</h2>
+                <p>@Model.weather.FirstOrDefault()?.description</p>
+            </div>
         </div>
         <div class="col">
             <div class="weather-details">
@@ -29,11 +34,12 @@
                     if (temperature2 == "-0") temperature2 = "0";
                 }
                 <p>Taupunkt: @temperature2 °C</p>
-                <p>Druck:  @Model.main.pressure mb</p>
+                <p>Druck: @Model.main.pressure mb</p>
                 <p>Sichtweite: @Model.visibility km</p>
-                <p>Sonnenaufgang:  @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunrise).ToLocalTime().ToString("HH:mm")</p>
-                <p>Sonnenuntergang:  @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunset).ToLocalTime().ToString("HH:mm")</p>
+                <p>Sonnenaufgang: @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunrise).ToLocalTime().ToString("HH:mm")</p>
+                <p>Sonnenuntergang: @DateTimeOffset.FromUnixTimeSeconds(Model.sys.sunset).ToLocalTime().ToString("HH:mm")</p>
             </div>
         </div>
     </div>
 </div>
+

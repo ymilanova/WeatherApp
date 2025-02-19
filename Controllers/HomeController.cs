@@ -9,29 +9,41 @@ namespace WeatherApp.Controllers
     {
         private readonly HttpClient client = new HttpClient();
 
+        //default results for api
+        private readonly string url = "https://api.openweathermap.org/data/2.5/weather?lat=51.46&lon=7.22&appid=b496262a837196953e9961e4c0d6d128&lang=de&units=metric";
+        
+
+        
         [HttpGet]
         public IActionResult Index()
         {
-            var response = client.GetFromJsonAsync<AllWeather>("https://api.openweathermap.org/data/2.5/weather?lat=51.46&lon=7.22&appid=b496262a837196953e9961e4c0d6d128&lang=de&units=metric").Result;
+           
 
-            var currentIcon = GetCurrentIcon(response.weather.Select(_ => _.main).First(),response.weather.Select(_=>_.icon).First());
-            ViewBag.CurrentIcon=currentIcon;
-            var currentTime = GetCurrentTime(response.timezone);
+            //Gather Weatherinfos, icon and current time
+            AllWeather? cityWeather = client.GetFromJsonAsync<AllWeather>(url).Result;
+            string? currentIcon = GetCurrentIcon(cityWeather.weather.Select(_ => _.main).First(), cityWeather.weather.Select(_=>_.icon).First());
+            DateTime? currentTime = GetCurrentTime(cityWeather.timezone);
+
+            ViewBag.CurrentIcon = currentIcon;
             ViewBag.CurrentTime = currentTime;
-            return View(response);
+            return View(cityWeather);
         }
 
         [HttpPost]
         public IActionResult Index([FromBody] Coordinates coordinates)
         {
+           //Coordinates x-y of the city
             string latitude = coordinates.Lat.ToString();
             string longitude = coordinates.Lng.ToString();
-            
-            var response = client.GetFromJsonAsync<AllWeather>($"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid=b496262a837196953e9961e4c0d6d128&lang=de&units=metric").Result;
-            var currentIcon = GetCurrentIcon(response.weather.Select(_ => _.main).First(), response.weather.Select(_ => _.icon).First());
-            ViewBag.CurrentIcon = currentIcon;
-            var currentTime = GetCurrentTime(response.timezone); ViewBag.CurrentTime = currentTime;
-            return View("Index", response);
+
+            //Gather Weatherinfos, icon and current time
+            AllWeather cityWeather = client.GetFromJsonAsync<AllWeather>($"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid=b496262a837196953e9961e4c0d6d128&lang=de&units=metric").Result;
+            var currentIcon = GetCurrentIcon(cityWeather.weather.Select(_ => _.main).First(), cityWeather.weather.Select(_ => _.icon).First());
+            var currentTime = GetCurrentTime(cityWeather.timezone);
+           
+            ViewBag.CurrentIcon = currentIcon; 
+            ViewBag.CurrentTime = currentTime;
+            return View("Index", cityWeather);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -45,7 +57,6 @@ namespace WeatherApp.Controllers
             var currentTime = utcNow.AddSeconds(timezoneOffset);
             return currentTime; 
         }
-
 
         private string GetCurrentIcon(string status, string iconCode)
         {
@@ -86,9 +97,6 @@ namespace WeatherApp.Controllers
                     break;
                 case "Hail":
                     weatherIcon = "hail.svg";
-                    break;
-                case "Tornado":
-                    weatherIcon = iconCode.EndsWith("d") ? "tornado-day.svg" : "tornado-night.svg";
                     break;
                 default:
                     weatherIcon = "clear-day.svg";
